@@ -129,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 1
+    train_epochs = 30
     split_dir = '/home/yikuangy/hw3/'
     
 '''overload the plotting function'''
@@ -187,7 +187,7 @@ for i,data_test1 in enumerate(data_train,0):
     #labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.forward(img1Test,img2Test)
     pred = (torch.round(output)).type('torch.LongTensor')
-    print type(pred.data), 'and ', type(labelTest.data)
+    #print type(pred.data), 'and ', type(labelTest.data)
     total += labelTest.size(0)
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
@@ -204,7 +204,7 @@ for i,data_test2 in enumerate(data_test,0):
     #labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.forward(img1Test,img2Test)
     pred = (torch.round(output)).type('torch.LongTensor')
-    print type(pred.data), 'and ', type(labelTest.data)
+    #print type(pred.data), 'and ', type(labelTest.data)
     total += labelTest.size(0)
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
