@@ -117,8 +117,8 @@ class SiameseNetWork(nn.Module):
         return x
     
     def forward(self,input1, input2):
-        output1 = self.foward_once(input1)
-        output2 = self.foward_once(input2)
+        output1 = self.forward_once(input1)
+        output2 = self.forward_once(input2)
         output = torch.cat((output1,output2),1)
         output = self.fcc(output)
         output = torch.sigmoid(output)
@@ -184,7 +184,7 @@ for i,data_test in enumerate(data_train,0):
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor')
     labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.foward(img1Test,img2Test)
+    output = net.forward(img1Test,img2Test)
     output = (torch.round(output)).type('torch.LongTensor')
     total += labelTest.size(0)
     correct += (output == labelTest).sum().type('torch.LongTensor')
@@ -200,7 +200,7 @@ for i,data_test in enumerate(data_test,0):
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor').cuda()
     labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.foward(img1Test,img2Test)
+    output = net.forward(img1Test,img2Test)
     output = (torch.round(output)).type('torch.LongTensor')
     total += labelTest.size(0)
     correct += (output == labelTest).sum().type('torch.LongTensor')
