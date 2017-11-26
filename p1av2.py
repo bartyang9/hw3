@@ -1,18 +1,18 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-import torch
+import torch #
 import torchvision
-import torchvision.datasets as dset
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset
+import torchvision.datasets as dset #
+import torchvision.transforms as transforms #
+from torch.utils.data import DataLoader, Dataset #
 import matplotlib.pyplot as plt
-import torchvision.utils
+import torchvision.utils #
 import numpy as np
 import random
 from PIL import Image
-from torch.autograd import Variable
+from torch.autograd import Variable #
 import PIL.ImageOps
-import torch.nn as nn
+import torch.nn as nn #
 from torch import optim
 import torch.nn.functional as F
 import os 
@@ -76,51 +76,98 @@ class lfwDataset(Dataset):
     def __len__(self):
         return len(self.lst)
     
-class SiameseNetWork(nn.Module):
+# =============================================================================
+# class SiameseNetWork(nn.Module):
+#     def __init__(self):
+#         super(SiameseNetWork,self).__init__()
+#         self.cnn = nn.Sequential(
+#                 nn.Conv2d(3, 64, kernel_size=5, padding=2),      
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm2d(64),                              
+#                 nn.MaxPool2d(2,stride = 2),                              
+#                 
+#                 nn.Conv2d(64, 128, kernel_size=5, padding=2),      
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm2d(128),                              
+#                 nn.MaxPool2d(2,stride = 2),                             
+#                 
+#                 nn.Conv2d(128, 256, kernel_size=3, padding=2),      
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm2d(256),                              
+#                 nn.MaxPool2d(2, stride=2),                             
+#                 
+#                 nn.Conv2d(256, 512, kernel_size=3, padding=1),      
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm2d(512),
+#                 )
+#         
+#         self.fc = nn.Sequential(
+#                 nn.Linear(16*16*512,1024),
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm1d(1024)
+#                 )
+#         self.fcc = nn.Sequential(nn.Linear(2048,1))
+#     
+#     def forward_once(self,x):
+#         x = self.cnn(x)
+#         x = x.view(x.size()[0], -1)
+#         x = self.fc(x)
+#         return x
+#     
+#     def forward(self,input1, input2):
+#         output1 = self.foward_once(input1)
+#         output2 = self.foward_once(input2)
+#         output = torch.cat((output1,output2),1)
+#         output = self.fcc(output)
+#         output = torch.sigmoid(output)
+#         return output
+# =============================================================================
+    
+    
+"building CNN"
+class SiameseNetWork (nn.Module):
     def __init__(self):
-        super(SiameseNetWork,self).__init__()
-        self.cnn = nn.Sequential(
-                nn.Conv2d(3, 64, kernel_size=5, padding=2),      
-                nn.ReLU(inplace=True),
-                nn.BatchNorm2d(64),                              
-                nn.MaxPool2d(2,stride = 2),                              
-                
-                nn.Conv2d(64, 128, kernel_size=5, padding=2),      
-                nn.ReLU(inplace=True),
-                nn.BatchNorm2d(128),                              
-                nn.MaxPool2d(2,stride = 2),                             
-                
-                nn.Conv2d(128, 256, kernel_size=3, padding=2),      
-                nn.ReLU(inplace=True),
-                nn.BatchNorm2d(256),                              
-                nn.MaxPool2d(2, stride=2),                             
-                
-                nn.Conv2d(256, 512, kernel_size=3, padding=1),      
-                nn.ReLU(inplace=True),
-                nn.BatchNorm2d(512),
-                )
-        
+        super(SiameseNetWork, self).__init__()
+        self.Cnn = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=(5, 5), stride=(1, 1), padding=2),     # 1
+            nn.ReLU(inplace=True),                                                                       # 2
+            nn.BatchNorm2d(num_features=64),                                                             # 3
+            nn.MaxPool2d(kernel_size=(2, 2),stride=(2, 2)),                                              # 4
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(5,5), stride=(1, 1), padding=2),    # 5
+            nn.ReLU(inplace=True),                                                                       # 6
+            nn.BatchNorm2d(num_features=128),                                                            # 7
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),                                             # 8
+            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(3, 3), stride=(1, 1), padding=1),  # 9
+            nn.ReLU(inplace=True),                                                                       # 10
+            nn.BatchNorm2d(num_features=256),                                                            # 11
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),                                             # 12
+            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=(3, 3), stride=(1, 1), padding=1),  # 13
+            nn.ReLU(inplace=True),                                                                       # 14
+            nn.BatchNorm2d(num_features=512)                                                             # 15
+        )
         self.fc = nn.Sequential(
-                nn.Linear(16*16*512,1024),
-                nn.ReLU(inplace=True),
-                nn.BatchNorm1d(1024)
-                )
-        self.fcc = nn.Sequential(nn.Linear(2048,1))
-    
-    def forward_once(self,x):
-        x = self.cnn(x)
-        x = x.view(x.size()[0], -1)
-        x = self.fc(x)
-        return x
-    
-    def forward(self,input1, input2):
-        output1 = self.foward_once(input1)
-        output2 = self.foward_once(input2)
-        output = torch.cat((output1,output2),1)
-        output = self.fcc(output)
+            nn.Linear(in_features=131072, out_features=1024),                                            # 17
+            nn.ReLU(inplace=True),                                                                       # 18
+            nn.BatchNorm2d(num_features=1024)                                                            # 19
+        )
+        self.fc1 = nn.Sequential(
+            nn.Linear(in_features=2048, out_features=1),
+            
+        )
+    def forward_once(self, x):
+        output = self.Cnn(x)
+        output = output.view(output.size()[0], -1)
+        output = self.fc(output)
+        return output
+    def forward(self, input1, input2):
+        input1 = self.forward_once(input1)
+        input2 = self.forward_once(input2)
+        output = torch.cat((input1, input2), 1)
+        output = self.fc1(output)
         output = torch.sigmoid(output)
         return output
-    
+
+
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
@@ -168,7 +215,7 @@ for epoch in range(Config.train_epochs):
             loss_log.append(loss.data[0])
             
 torch.save(net.state_dict(),f='p1a_model')
-        
+
 net.load_state_dict(torch.load(f='p1a_model'))
 
 '''train testing'''
