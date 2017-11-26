@@ -209,5 +209,5 @@ for i,data_test2 in enumerate(data_test,0):
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
-print('Accuracy of the network on trained images: %d %%' % accuracy)
+print('Accuracy of the network on tested images: %d %%' % accuracy)
 

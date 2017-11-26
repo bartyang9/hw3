@@ -129,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 30
+    train_epochs = 1
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
@@ -158,7 +158,7 @@ data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_
 net = SiameseNetWork().cuda()
 loss = ContrastiveLoss()
 #loss = nn.BCELoss()
-optimiz = optim.Adam(params=net.parameters(),lr = 0.00001)
+optimiz = optim.Adam(params=net.parameters(),lr = 0.001)
 count = []
 loss_log = []
 iter_num = 0
@@ -167,11 +167,11 @@ for epoch in range(Config.train_epochs):
         img1,img2,label = data
         #print type(img1), type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output = net.forward(img1,img2)
+        output1, output2 = net.forward(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
-        loss_BCE = loss(output,label)
-        loss_BCE.backward()
+        loss_contras = loss(output1,output2,label)
+        loss_contras.backward()
         optimiz.step()
         if i % 10 == 0:
             print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
@@ -215,5 +215,5 @@ for i,data_test2 in enumerate(data_test,0):
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
-print('Accuracy of the network on trained images: %d %%' % accuracy)
+print('Accuracy of the network on tested images: %d %%' % accuracy)
 
