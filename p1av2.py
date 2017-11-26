@@ -41,21 +41,22 @@ class lfwDataset(Dataset):
         
     def __getitem__(self,index):
         root_dir = self.root
-        image_tuple = self.reader[index]
-        img1_dir = ''.join([root_dir,image_tuple[0]])
-        img2_dir = ''.join([root_dir,image_tuple[1]])
+        tempdata = self.reader[index]
+        img1_dir = ''.join([root_dir,tempdata[0]])
+        img2_dir = ''.join([root_dir,tempdata[1]])
         img1 = Image.open(img1_dir)
         img2 = Image.open(img2_dir)
-        label = image_tuple[2]
+        label = tempdata[2]
+        
         if self.transform is not None:
             if self.augment is True:
                 img1 = self.augmentation(img1)
                 img2 = self.augmentation(img2)
             img1 = self.transform(img1)
             img2 = self.transform(img2)
-            label = torch.from_numpy(np.array([label], dtype=float))
+            labelFinal = torch.from_numpy(np.array([label], dtype=float))
         
-        return img1, img2, label
+        return img1, img2, labelFinal
     
     def augmentation(self, img0):
         rotate_range = random.uniform(-30,30)
@@ -69,9 +70,8 @@ class lfwDataset(Dataset):
             img0 = img0.transpose(Image.FLIP_LEFT_RIGHT)
         if np.random.random() < 0.7:
             img0 = img0.resize((int(128*scale_range),int(128*scale_range)))
-            width, height = img0.size
-            half_the_width = width / 2
-            half_the_height = height / 2
+            half_the_width = img0.size[0] / 2
+            half_the_height = img1.size[1] / 2
             img0 = img0.crop((half_the_width - 64, half_the_height - 64,
                               half_the_width + 64, half_the_height + 64))
         return img0
@@ -93,7 +93,7 @@ class SiameseNetWork(nn.Module):
                 nn.BatchNorm2d(128),                              
                 nn.MaxPool2d(2,stride = 2),                             
                 
-                nn.Conv2d(128, 256, kernel_size=3, padding=2),      
+                nn.Conv2d(128, 256, kernel_size=3, padding=1),      
                 nn.ReLU(inplace=True),
                 nn.BatchNorm2d(256),                              
                 nn.MaxPool2d(2, stride=2),                             
@@ -103,18 +103,18 @@ class SiameseNetWork(nn.Module):
                 nn.BatchNorm2d(512),
                 )
         
+        self.fc = nn.Sequential(
+                nn.Linear(16*16*512,1024),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm1d(1024),
+                )
 # =============================================================================
 #         self.fc = nn.Sequential(
-#                 nn.Linear(16*16*512,1024),
-#                 nn.ReLU(inplace=True),
-#                 nn.BatchNorm1d(1024),
-#                 )
+#             nn.Linear(in_features=131072, out_features=1024),                                            # 17
+#             nn.ReLU(inplace=True),                                                                       # 18
+#             nn.BatchNorm2d(num_features=1024)
+#             )
 # =============================================================================
-        self.fc = nn.Sequential(
-            nn.Linear(in_features=131072, out_features=1024),                                            # 17
-            nn.ReLU(inplace=True),                                                                       # 18
-            nn.BatchNorm2d(num_features=1024)
-            )
         self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
