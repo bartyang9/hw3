@@ -125,7 +125,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 100
+    train_epochs = 1
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
