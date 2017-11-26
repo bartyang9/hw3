@@ -140,7 +140,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--load', action = 'store_true')
     parser.add_argument('--save', action = 'store_true')
-    parser.add_argument("file")
+    parser.add_argument("file", type=str)
     args = parser.parse_args()
     file = args.file
 # =============================================================================
@@ -225,5 +225,5 @@ def main():
         accuracy = (100*correct/total)
         print('Accuracy of the network on tested images: %d %%' % accuracy)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
