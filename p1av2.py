@@ -200,10 +200,11 @@ correct = 0
 for i,data_test2 in enumerate(data_test,0):
     img1Test,img2Test,labelTest = data_test2
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+    labelTest = labelTest.type('torch.LongTensor')
     #labelTest = labelTest.type(torch.FloatTensor).cuda()
-    labelTest = labelTest.type('torch.LongTensor').cuda()
     output = net.forward(img1Test,img2Test)
     pred = (torch.round(output)).type('torch.LongTensor')
+    print type(pred.data), 'and ', type(labelTest.data)
     total += labelTest.size(0)
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
