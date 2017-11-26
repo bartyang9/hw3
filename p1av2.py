@@ -74,7 +74,7 @@ class lfwDataset(Dataset):
         return img0
     
     def __len__(self):
-        return len(self.lst)
+        return len(self.reader)
     
 class SiameseNetWork(nn.Module):
     def __init__(self):
