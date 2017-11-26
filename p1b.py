@@ -132,16 +132,21 @@ class Config():
     train_epochs = 30
     split_dir = '/home/yikuangy/hw3/'
     
-'''overload the plotting function'''
-def imshow(img):
-    plt.axis("off")
-    img_np = img.numpy()
-    plt.imshow(np.transpose(img_np,(1,2,0)))
-    plt.show()
+'''define loss function'''
+class ContrastiveLoss(nn.Module):
+    def __init__(self,margin=2.0):
+        super(ContrastiveLoss,self).__init__()
+        self.margin = margin
+        
+    def forward(self,output1,output2,label):
+        euclidean_distance = F.pairwise_distance(output1,output2)
+        loss_contrastive = torch.mean(label*torch.pow(euclidean_distance,2) +
+                                      (1-label)* torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0),2))
+        return loss_contrastive
     
 '''create traning and testing reader&dataset'''
 readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=False,reader=readersTrain,
+lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
                        transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
 readerTest = reader(Config.split_dir,'test.txt')
 lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
@@ -151,7 +156,8 @@ data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_
 
 '''train'''
 net = SiameseNetWork().cuda()
-loss = nn.BCELoss()
+loss = ContrastiveLoss()
+#loss = nn.BCELoss()
 optimiz = optim.Adam(params=net.parameters(),lr = 0.00001)
 count = []
 loss_log = []
@@ -175,7 +181,7 @@ for epoch in range(Config.train_epochs):
             
 torch.save(net.state_dict(),f='p1a_model')
 
-net.load_state_dict(torch.load(f='p1a_model_no_aug'))
+net.load_state_dict(torch.load(f='p1a_model'))
 
 '''train testing'''
 total = 0
