@@ -155,7 +155,7 @@ iter_num = 0
 for epoch in range(Config.train_epochs):
     for i,data in enumerate(data_train,0):
         img1,img2,label = data
-        img1,img2,label = Variable(img1).cuda(), Variable(img2).cude(), Variable(label).cuda()
+        img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
         output = net(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
@@ -177,7 +177,7 @@ total = 0
 correct = 0
 for i,data_test in enumerate(data_train,0):
     img1Test,img2Test,labelTest = data_test
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cude(), Variable(labelTest).cuda()
+    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor')
     labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.foward(img1Test,img2Test)
@@ -193,7 +193,7 @@ total = 0
 correct = 0
 for i,data_test in enumerate(data_test,0):
     img1Test,img2Test,labelTest = data_test
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cude(), Variable(labelTest).cuda()
+    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor').cuda()
     labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.foward(img1Test,img2Test)
