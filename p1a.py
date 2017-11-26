@@ -133,7 +133,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 2#30
+    train_epochs = 1#30
     split_dir = '/home/yikuangy/hw3/'
     
 def main():
@@ -181,11 +181,11 @@ def main():
                     iter_num += 10
                     count.append(iter_num)
                     loss_log.append(loss_BCE.data[0])
-        torch.save(net.state_dict(), f=file)
+        torch.save(net.state_dict(), f=args.file)
         
         
     if args.load:
-        net.load_state_dict(torch.load(f=file))
+        net.load_state_dict(torch.load(f=args.file))
 # =============================================================================
 #     '''train testing'''
 # =============================================================================
