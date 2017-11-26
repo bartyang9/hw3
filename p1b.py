@@ -146,7 +146,7 @@ class ContrastiveLoss(nn.Module):
     
 '''create traning and testing reader&dataset'''
 readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
+lfw_train = lfwDataset(root=Config.training_dir,augment=False,reader=readersTrain,
                        transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
 readerTest = reader(Config.split_dir,'test.txt')
 lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
@@ -167,21 +167,21 @@ for epoch in range(Config.train_epochs):
         img1,img2,label = data
         #print type(img1), type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output1, output2 = net.forward(img1,img2)
+        output1,output2 = net.forward(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
         loss_contras = loss(output1,output2,label)
         loss_contras.backward()
         optimiz.step()
         if i % 10 == 0:
-            print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
+            print("Epoch num {}\n Current loss {}\n".format(epoch, loss_contras.data[0]))
             iter_num += 10
             count.append(iter_num)
-            loss_log.append(loss_BCE.data[0])
+            loss_log.append(loss_contras.data[0])
             
-torch.save(net.state_dict(),f='p1a_model')
+torch.save(net.state_dict(),f='p1b_model')
 
-net.load_state_dict(torch.load(f='p1a_model'))
+net.load_state_dict(torch.load(f='p1b_model'))
 
 '''train testing'''
 total = 0
