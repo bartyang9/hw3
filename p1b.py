@@ -167,7 +167,7 @@ for epoch in range(Config.train_epochs):
         img1,img2,label = data
         #print type(img1), type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output1,output2 = net.forward(img1,img2)
+        output1,output2 = net(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
         loss_contras = loss(output1,output2,label)
