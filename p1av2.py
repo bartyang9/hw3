@@ -57,7 +57,7 @@ class lfwDataset(Dataset):
     def augmentation(self, img0):
         rotate_range = random.uniform(-30,30)
         translation_range = random.uniform(-10,10)
-        scale_range = random.uniform(0.7,1,3)
+        scale_range = random.uniform(0.7,1.3)
         if np.random.random() < 0.7:
             img0 = img0.rotate(rotate_range)
         if np.random.random() < 0.7:
