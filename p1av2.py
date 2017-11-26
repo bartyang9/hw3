@@ -113,8 +113,8 @@ class SiameseNetWork(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(in_features=131072, out_features=1024),                                            # 17
             nn.ReLU(inplace=True),                                                                       # 18
-            nn.BatchNorm2d(num_features=1024
-                           )
+            nn.BatchNorm2d(num_features=1024)
+            )
         self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
