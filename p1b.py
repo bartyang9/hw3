@@ -226,6 +226,3 @@ if __name__ == "__main__":
         correct = correct.data.numpy().astype(np.float)
         accuracy = (100*correct/total)
         print('Accuracy of the network on test images: %d %%' % accuracy)
-    
-if __name__ == "__main__":
-    main()

@@ -136,7 +136,7 @@ class Config():
     train_epochs = 1#30
     split_dir = '/home/yikuangy/hw3/'
     
-def main():
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--load', action = 'store_true')
     parser.add_argument('--save', action = 'store_true')
@@ -224,5 +224,3 @@ def main():
         accuracy = (100*correct/total)
         print('Accuracy of the network on tested images: %d %%' % accuracy)
 
-if __name__ == '__main__':
-    main()
