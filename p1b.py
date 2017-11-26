@@ -188,7 +188,6 @@ for i,data_test1 in enumerate(data_train,0):
     img1Test,img2Test,labelTest = data_test1
     labelTest = labelTest.type(torch.ByteTensor)
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor')
     output1,output2 = net.forward(img1Test,img2Test)
     dist = F.pairwise_distance(output1,output2)
     total += labelTest.size(0)
@@ -207,7 +206,6 @@ for i,data_test2 in enumerate(data_test,0):
     img1Test,img2Test,labelTest = data_test2
     labelTest = labelTest.type(torch.ByteTensor)
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor')
     output1,output2 = net.forward(img1Test,img2Test)
     dist = F.pairwise_distance(output1,output2)
     total += labelTest.size(0)
