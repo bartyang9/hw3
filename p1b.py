@@ -174,9 +174,9 @@ for epoch in range(Config.train_epochs):
             count.append(iter_num)
             loss_log.append(loss_contras.data[0])
             
-torch.save(net.state_dict(),f='p1b_model_no_aug_1epoch')
+torch.save(net.state_dict(),f='p1b_model_aug_100epochv2')
 
-net.load_state_dict(torch.load(f='p1b_model_no_aug_1epoch'))
+net.load_state_dict(torch.load(f='p1b_model_aug_100epochv2'))
 
 '''train testing'''
 total = 0
