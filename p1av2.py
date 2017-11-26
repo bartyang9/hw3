@@ -162,9 +162,9 @@ for epoch in range(Config.train_epochs):
         loss_BCE = loss(output,label)
         loss_BCE.backward()
         optimiz.step()
-        for i % 10 == 0:
+        if i % 10 == 0:
             print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
-            iiter_num += 10
+            iter_num += 10
             count.append(iter_num)
             loss_log.append(loss.data[0])
             
