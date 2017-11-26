@@ -120,10 +120,7 @@ class SiameseNetWork(nn.Module):
     def forward(self,input1,input2):
         output1 = self.forward_once(input1)
         output2 = self.forward_once(input2)
-        output = torch.cat((output1,output2),1)
-        output = self.fcc(output)
-        result = torch.sigmoid(output)
-        return result
+        return output1, output2
 
 
 class Config():
@@ -167,7 +164,7 @@ for epoch in range(Config.train_epochs):
         img1,img2,label = data
         #print type(img1), type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output1,output2 = net(img1,img2)
+        output1,output2 = net.forward(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
         loss_contras = loss(output1,output2,label)
