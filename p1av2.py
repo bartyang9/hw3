@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-
+import torch
 import torchvision
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
@@ -10,7 +10,6 @@ import torchvision.utils
 import numpy as np
 import random
 from PIL import Image
-import torch
 from torch.autograd import Variable
 import PIL.ImageOps
 import torch.nn as nn
@@ -123,10 +122,10 @@ class SiameseNetWork(nn.Module):
         return output
     
 class Config():
-    training_dir =  '/home/yikuangy/hw3/lfw' 
+    training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
     train_epochs = 100
-    split_dir = '/home/yikuangy/hw3'
+    split_dir = '/home/yikuangy/hw3/'
     
 '''overload the plotting function'''
 def imshow(img):
