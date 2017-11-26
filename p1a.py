@@ -129,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 1#30
+    train_epochs = 100#30
     split_dir = '/home/yikuangy/hw3/'
     
 '''overload the plotting function'''
