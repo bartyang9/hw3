@@ -15,6 +15,7 @@ import PIL.ImageOps
 import torch.nn as nn 
 from torch import optim
 import torch.nn.functional as F
+import argparse
 
 '''create the image folder list'''
 def reader(r,mode):
@@ -139,77 +140,94 @@ class ContrastiveLoss(nn.Module):
                                       (1-label)* torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0),2))
         return loss_contrastive
     
-'''create traning and testing reader&dataset'''
-readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
-                       transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
-readerTest = reader(Config.split_dir,'test.txt')
-lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
-                      transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
-data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num_workers=8)
-data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_workers=8)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--load', action = 'store_true')
+    parser.add_argument('--save', action = 'store_true')
+    parser.add_argument("file")
+    args = parser.parse_args()
+    file = args.file    
+# =============================================================================
+#     '''create traning and testing reader&dataset'''
+# =============================================================================
+    readersTrain = reader(Config.split_dir, 'train.txt')
+    lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
+                           transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
+    readerTest = reader(Config.split_dir,'test.txt')
+    lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
+                          transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
+    data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num_workers=8)
+    data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_workers=8)
+    net = SiameseNetWork().cuda()
 
-'''train'''
-net = SiameseNetWork().cuda()
-loss = ContrastiveLoss()
-#loss = nn.BCELoss()
-optimiz = optim.Adam(params=net.parameters(),lr = 0.001)
-count = []
-loss_log = []
-iter_num = 0
-for epoch in range(Config.train_epochs):
-    for i,data in enumerate(data_train,0):
-        img1,img2,label = data
-        #print type(img1), type(label)
-        img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output1,output2 = net.forward(img1,img2)
-        optimiz.zero_grad()
-        label = label.type(torch.FloatTensor).cuda()
-        loss_contras = loss(output1,output2,label)
-        loss_contras.backward()
-        optimiz.step()
-        if i % 10 == 0:
-            print("Epoch num {}\n Current loss {}\n".format(epoch, loss_contras.data[0]))
-            iter_num += 10
-            count.append(iter_num)
-            loss_log.append(loss_contras.data[0])
-            
-torch.save(net.state_dict(),f='p1b_model_aug_100epochv2')
-
-net.load_state_dict(torch.load(f='p1b_model_aug_100epochv2'))
-
-'''train testing'''
-total = 0
-correct = 0
-threshold = 1
-for i,data_test1 in enumerate(data_train,0):
-    img1Test,img2Test,labelTest = data_test1
-    labelTest = labelTest.type(torch.ByteTensor)
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    output1,output2 = net.forward(img1Test,img2Test)
-    dist = F.pairwise_distance(output1,output2)
-    total += labelTest.size(0)
-    pred = (dist < threshold)
-    correct += (pred == labelTest).sum().type('torch.LongTensor')
-correct = correct.data.numpy().astype(np.float)
-accuracy = (100*correct/total)
-print('Accuracy of the network on trained images: %d %%' % accuracy)
-
-'''test testing'''
-'''train testing'''
-total = 0
-correct = 0
-threshold = 1
-for i,data_test2 in enumerate(data_test,0):
-    img1Test,img2Test,labelTest = data_test2
-    labelTest = labelTest.type(torch.ByteTensor)
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    output1,output2 = net.forward(img1Test,img2Test)
-    dist = F.pairwise_distance(output1,output2)
-    total += labelTest.size(0)
-    pred = (dist < threshold)
-    correct += (pred == labelTest).sum().type('torch.LongTensor')
-correct = correct.data.numpy().astype(np.float)
-accuracy = (100*correct/total)
-print('Accuracy of the network on test images: %d %%' % accuracy)
-
+# =============================================================================
+#     '''train'''
+# =============================================================================
+    if args.save:
+        loss = ContrastiveLoss()
+        #loss = nn.BCELoss()
+        optimiz = optim.Adam(params=net.parameters(),lr = 0.001)
+        count = []
+        loss_log = []
+        iter_num = 0
+        for epoch in range(Config.train_epochs):
+            for i,data in enumerate(data_train,0):
+                img1,img2,label = data
+                #print type(img1), type(label)
+                img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
+                output1,output2 = net.forward(img1,img2)
+                optimiz.zero_grad()
+                label = label.type(torch.FloatTensor).cuda()
+                loss_contras = loss(output1,output2,label)
+                loss_contras.backward()
+                optimiz.step()
+                if i % 10 == 0:
+                    print("Epoch num {}\n Current loss {}\n".format(epoch, loss_contras.data[0]))
+                    iter_num += 10
+                    count.append(iter_num)
+                    loss_log.append(loss_contras.data[0])
+                    
+        torch.save(net.state_dict(),f=file)
+        
+        
+    if args.load:
+        net.load_state_dict(torch.load(f=file))
+    
+# =============================================================================
+#     '''train testing'''
+# =============================================================================
+        total = 0
+        correct = 0
+        threshold = 1
+        for i,data_test1 in enumerate(data_train,0):
+            img1Test,img2Test,labelTest = data_test1
+            labelTest = labelTest.type(torch.ByteTensor)
+            img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+            output1,output2 = net.forward(img1Test,img2Test)
+            dist = F.pairwise_distance(output1,output2)
+            total += labelTest.size(0)
+            pred = (dist < threshold)
+            correct += (pred == labelTest).sum().type('torch.LongTensor')
+        correct = correct.data.numpy().astype(np.float)
+        accuracy = (100*correct/total)
+        print('Accuracy of the network on trained images: %d %%' % accuracy)
+        
+    # =============================================================================
+    #     '''test testing'''
+    # =============================================================================
+        total = 0
+        correct = 0
+        threshold = 1
+        for i,data_test2 in enumerate(data_test,0):
+            img1Test,img2Test,labelTest = data_test2
+            labelTest = labelTest.type(torch.ByteTensor)
+            img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+            output1,output2 = net.forward(img1Test,img2Test)
+            dist = F.pairwise_distance(output1,output2)
+            total += labelTest.size(0)
+            pred = (dist < threshold)
+            correct += (pred == labelTest).sum().type('torch.LongTensor')
+        correct = correct.data.numpy().astype(np.float)
+        accuracy = (100*correct/total)
+        print('Accuracy of the network on test images: %d %%' % accuracy)
+    
