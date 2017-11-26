@@ -71,7 +71,7 @@ class lfwDataset(Dataset):
         if np.random.random() < 0.7:
             img0 = img0.resize((int(128*scale_range),int(128*scale_range)))
             half_the_width = img0.size[0] / 2
-            half_the_height = img1.size[1] / 2
+            half_the_height = img0.size[1] / 2
             img0 = img0.crop((half_the_width - 64, half_the_height - 64,
                               half_the_width + 64, half_the_height + 64))
         return img0
