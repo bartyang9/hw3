@@ -183,9 +183,9 @@ def main():
                     count.append(iter_num)
                     loss_log.append(loss_BCE.data[0])
                     
-        torch.save(net.state_dict(),f='p1a_model_aug_final')
+        torch.save(net.state_dict(),f=file)
     if args.load:
-        net.load_state_dict(torch.load(f='p1a_model_aug_final'))
+        net.load_state_dict(torch.load(f=file))
 
 # =============================================================================
 #     '''train testing'''
