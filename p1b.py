@@ -16,7 +16,10 @@ import torch.nn as nn #
 from torch import optim
 import torch.nn.functional as F
 
-
+'''show the loss'''
+def show_plot(iter,loss):
+    plt.plot(iter,loss)
+    plt.show()
 
 '''create the image folder list'''
 def reader(r,mode):
@@ -104,7 +107,7 @@ class SiameseNetWork(nn.Module):
                 )
         
         self.fc = nn.Sequential(
-                nn.Linear(16*16*512,1024),
+                nn.Linear(131072,1024),
                 nn.ReLU(inplace=True),
                 nn.BatchNorm1d(1024),
                 )
@@ -112,10 +115,10 @@ class SiameseNetWork(nn.Module):
         self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
-        x = self.cnn(x)
-        x = x.view(x.size()[0], -1)
-        x = self.fc(x)
-        return x
+        output = self.cnn(x)
+        output = output.view(x.size()[0], -1)
+        output = self.fc(output)
+        return output
     
     def forward(self,input1,input2):
         output1 = self.forward_once(input1)
@@ -126,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 100
+    train_epochs = 1
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
@@ -175,6 +178,7 @@ for epoch in range(Config.train_epochs):
             iter_num += 10
             count.append(iter_num)
             loss_log.append(loss_contras.data[0])
+show_plot(count,loss_log)
             
 torch.save(net.state_dict(),f='p1b_model_aug_100epoch')
 
