@@ -1,18 +1,18 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-import torch #
+import torch 
 import torchvision
-import torchvision.datasets as dset #
-import torchvision.transforms as transforms #
-from torch.utils.data import DataLoader, Dataset #
+import torchvision.datasets as dset 
+import torchvision.transforms as transforms 
+from torch.utils.data import DataLoader, Dataset 
 import matplotlib.pyplot as plt
-import torchvision.utils #
+import torchvision.utils 
 import numpy as np
 import random
 from PIL import Image
-from torch.autograd import Variable #
+from torch.autograd import Variable 
 import PIL.ImageOps
-import torch.nn as nn #
+import torch.nn as nn 
 from torch import optim
 import torch.nn.functional as F
 
