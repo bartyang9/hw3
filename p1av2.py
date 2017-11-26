@@ -108,6 +108,7 @@ class SiameseNetWork(nn.Module):
                 nn.ReLU(inplace=True),
                 nn.BatchNorm1d(1024)
                 )
+        
         self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
@@ -116,13 +117,13 @@ class SiameseNetWork(nn.Module):
         x = self.fc(x)
         return x
     
-    def forward(self,input1, input2):
+    def forward(self,input1,input2):
         output1 = self.forward_once(input1)
         output2 = self.forward_once(input2)
         output = torch.cat((output1,output2),1)
         output = self.fcc(output)
-        output = torch.sigmoid(output)
-        return output
+        result = torch.sigmoid(output)
+        return result
 
 
 class Config():
@@ -158,9 +159,9 @@ iter_num = 0
 for epoch in range(Config.train_epochs):
     for i,data in enumerate(data_train,0):
         img1,img2,label = data
-        print type(img1),type(label)
+        #print type(img1), type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output = net(img1,img2)
+        output = net.forward(img1,img2)
         optimiz.zero_grad()
         label = label.type(torch.FloatTensor).cuda()
         loss_BCE = loss(output,label)
