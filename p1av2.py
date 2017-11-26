@@ -155,6 +155,7 @@ iter_num = 0
 for epoch in range(Config.train_epochs):
     for i,data in enumerate(data_train,0):
         img1,img2,label = data
+        print type(img1),type(label)
         img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
         output = net(img1,img2)
         optimiz.zero_grad()
