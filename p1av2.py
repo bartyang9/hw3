@@ -94,7 +94,7 @@ class SiameseNetWork(nn.Module):
                 nn.MaxPool2d(2,stride = 2),                             
                 
                 nn.Conv2d(128, 256, kernel_size=3, padding=1),      
-                nn.ReLU(inplace=True),
+                nn.ReLU(Git works best if you give it some basic information: your name and your email address. You can set these options in Git with the following commands:inplace=True),
                 nn.BatchNorm2d(256),                              
                 nn.MaxPool2d(2, stride=2),                             
                 
@@ -129,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 3
+    train_epochs = 1
     split_dir = '/home/yikuangy/hw3/'
     
 '''overload the plotting function'''
