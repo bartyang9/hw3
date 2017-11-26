@@ -138,8 +138,8 @@ class Config():
     
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--load', action = 'store_true')
-    parser.add_argument('--save', action = 'store_true')
+    parser.add_argument('--load', action='store_true')
+    parser.add_argument('--save', action='store_true')
     parser.add_argument("file")
     args = parser.parse_args()
     
