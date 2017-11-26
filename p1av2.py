@@ -177,7 +177,7 @@ for epoch in range(Config.train_epochs):
             print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
             iter_num += 10
             count.append(iter_num)
-            loss_log.append(loss.data[0])
+            loss_log.append(loss_BCE.data[0])
             
 torch.save(net.state_dict(),f='p1a_model')
 
