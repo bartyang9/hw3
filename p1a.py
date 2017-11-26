@@ -129,7 +129,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 30
+    train_epochs = 1#30
     split_dir = '/home/yikuangy/hw3/'
     
 '''overload the plotting function'''
@@ -141,7 +141,7 @@ def imshow(img):
     
 '''create traning and testing reader&dataset'''
 readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=False,reader=readersTrain,
+lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
                        transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
 readerTest = reader(Config.split_dir,'test.txt')
 lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
@@ -173,9 +173,9 @@ for epoch in range(Config.train_epochs):
             count.append(iter_num)
             loss_log.append(loss_BCE.data[0])
             
-torch.save(net.state_dict(),f='p1a_model_no_aug')
+torch.save(net.state_dict(),f='p1a_model_aug_100')
 
-net.load_state_dict(torch.load(f='p1a_model_no_aug'))
+net.load_state_dict(torch.load(f='p1a_model_aug_100'))
 
 '''train testing'''
 total = 0
