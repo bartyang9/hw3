@@ -103,12 +103,18 @@ class SiameseNetWork(nn.Module):
                 nn.BatchNorm2d(512),
                 )
         
+# =============================================================================
+#         self.fc = nn.Sequential(
+#                 nn.Linear(16*16*512,1024),
+#                 nn.ReLU(inplace=True),
+#                 nn.BatchNorm1d(1024),
+#                 )
+# =============================================================================
         self.fc = nn.Sequential(
-                nn.Linear(16*16*512,1024),
-                nn.ReLU(inplace=True),
-                nn.BatchNorm1d(1024)
-                )
-        
+            nn.Linear(in_features=131072, out_features=1024),                                            # 17
+            nn.ReLU(inplace=True),                                                                       # 18
+            nn.BatchNorm2d(num_features=1024
+                           )
         self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
