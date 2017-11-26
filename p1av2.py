@@ -48,13 +48,13 @@ class lfwDataset(Dataset):
         if self.transform is not None:
             if self.augment is True:
                 img1 = self.augmentation(img1)
-                img2 = self.augmendation(img2)
+                img2 = self.augmentation(img2)
             img1 = self.transform(img1)
             img2 = self.transform(img2)
             
         return img1, img2, label
     
-    def augmendation(self, img0):
+    def augmentation(self, img0):
         rotate_range = random.uniform(-30,30)
         translation_range = random.uniform(-10,10)
         scale_range = random.uniform(0.7,1,3)
