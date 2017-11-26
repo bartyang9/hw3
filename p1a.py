@@ -142,7 +142,6 @@ def main():
     parser.add_argument('--save', action = 'store_true')
     parser.add_argument("file")
     args = parser.parse_args()
-    
     file = args.file
 # =============================================================================
 #     '''create traning and testing reader&dataset'''
@@ -182,7 +181,6 @@ def main():
                     iter_num += 10
                     count.append(iter_num)
                     loss_log.append(loss_BCE.data[0])
-                    
         torch.save(net.state_dict(),f=file)
         
         
