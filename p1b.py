@@ -125,7 +125,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 1
+    train_epochs = 100
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
@@ -164,6 +164,7 @@ if __name__ == "__main__":
 #     '''train'''
 # =============================================================================
     if args.save:
+        
         loss = ContrastiveLoss()
         optimiz = optim.Adam(params=net.parameters(),lr = 0.001)
         count = []
@@ -184,6 +185,7 @@ if __name__ == "__main__":
                     iter_num += 10
                     count.append(iter_num)
                     loss_log.append(loss_contras.data[0])
+        
         torch.save(net.state_dict(),f=args.file)
         
         
