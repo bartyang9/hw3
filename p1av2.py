@@ -101,11 +101,11 @@ class SiameseNetWork(nn.Module):
                 )
         
         self.fc = nn.Sequential(
-                nn.linear(16*16*512,1024),
+                nn.Linear(16*16*512,1024),
                 nn.ReLU(inplace=True),
                 nn.BatchNorm1d(1024)
                 )
-        self.fcc = nn.Sequential(nn.linear(2048,1))
+        self.fcc = nn.Sequential(nn.Linear(2048,1))
     
     def forward_once(self,x):
         x = self.cnn(x)
