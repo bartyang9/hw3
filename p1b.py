@@ -126,7 +126,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 1
+    train_epochs = 50
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
@@ -176,9 +176,9 @@ for epoch in range(Config.train_epochs):
             count.append(iter_num)
             loss_log.append(loss_contras.data[0])
             
-torch.save(net.state_dict(),f='p1b_model_aug')
+torch.save(net.state_dict(),f='p1b_model_aug_50epoch')
 
-net.load_state_dict(torch.load(f='p1b_model_aug'))
+net.load_state_dict(torch.load(f='p1b_model_aug_50epoch'))
 
 '''train testing'''
 total = 0
