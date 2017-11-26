@@ -173,7 +173,6 @@ for epoch in range(Config.train_epochs):
             iter_num += 10
             count.append(iter_num)
             loss_log.append(loss_contras.data[0])
-show_plot(count,loss_log)
             
 torch.save(net.state_dict(),f='p1b_model_no_aug_1epoch')
 
