@@ -183,12 +183,13 @@ correct = 0
 for i,data_test in enumerate(data_train,0):
     img1Test,img2Test,labelTest = data_test
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor')
     labelTest = labelTest.type(torch.FloatTensor).cuda()
+    labelTest = labelTest.type('torch.LongTensor')
     output = net.forward(img1Test,img2Test)
-    output = (torch.round(output)).type('torch.LongTensor')
+    pred = (torch.round(output)).type('torch.LongTensor')
+    print type(pred), 'and ', type(labelTest)
     total += labelTest.size(0)
-    correct += (output == labelTest).sum().type('torch.LongTensor')
+    correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
 print('Accuracy of the network on trained images: %d %%' % accuracy)
