@@ -15,10 +15,12 @@ import PIL.ImageOps
 import torch.nn as nn 
 from torch import optim
 import torch.nn.functional as F
+import argparse
 
 
-
-'''create the image folder list'''
+# =============================================================================
+# '''create the image folder list'''
+# =============================================================================
 def reader(r,mode):
     path = ''.join([r,mode])
     file = open(path)
@@ -31,7 +33,9 @@ def reader(r,mode):
     return result
 
 
-'''Custom Dataset'''
+# =============================================================================
+# '''Custom Dataset'''
+# =============================================================================
 class lfwDataset(Dataset):
     def __init__(self,root,reader,augment,transform=None):
         self.root = root
@@ -129,85 +133,97 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 100#30
+    train_epochs = 1#30
     split_dir = '/home/yikuangy/hw3/'
     
-'''overload the plotting function'''
-def imshow(img):
-    plt.axis("off")
-    img_np = img.numpy()
-    plt.imshow(np.transpose(img_np,(1,2,0)))
-    plt.show()
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--load', action = 'store_true')
+    parser.add_argument('--save', action = 'store.true')
+    parser.add_argument("file")
+    args = parser.parse_args()
     
-'''create traning and testing reader&dataset'''
-readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
-                       transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
-readerTest = reader(Config.split_dir,'test.txt')
-lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
-                      transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
-data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num_workers=8)
-data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_workers=8)
+    file = args.file
+# =============================================================================
+#     '''create traning and testing reader&dataset'''
+# =============================================================================
+    readersTrain = reader(Config.split_dir, 'train.txt')
+    lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
+                           transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
+    readerTest = reader(Config.split_dir,'test.txt')
+    lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
+                          transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
+    data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num_workers=8)
+    data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_workers=8)
+    net = SiameseNetWork().cuda()
 
-'''train'''
-net = SiameseNetWork().cuda()
-loss = nn.BCELoss()
-optimiz = optim.Adam(params=net.parameters(),lr = 0.00001)
-count = []
-loss_log = []
-iter_num = 0
-for epoch in range(Config.train_epochs):
-    for i,data in enumerate(data_train,0):
-        img1,img2,label = data
-        #print type(img1), type(label)
-        img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
-        output = net.forward(img1,img2)
-        optimiz.zero_grad()
-        label = label.type(torch.FloatTensor).cuda()
-        loss_BCE = loss(output,label)
-        loss_BCE.backward()
-        optimiz.step()
-        if i % 10 == 0:
-            print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
-            iter_num += 10
-            count.append(iter_num)
-            loss_log.append(loss_BCE.data[0])
-            
-torch.save(net.state_dict(),f='p1a_model_aug_100')
+# =============================================================================
+#     '''train''''
+# =============================================================================
+    if args.save:
+        loss = nn.BCELoss()
+        optimiz = optim.Adam(params=net.parameters(),lr = 0.00001)
+        count = []
+        loss_log = []
+        iter_num = 0
+        for epoch in range(Config.train_epochs):
+            for i,data in enumerate(data_train,0):
+                img1,img2,label = data
+                #print type(img1), type(label)
+                img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
+                output = net.forward(img1,img2)
+                optimiz.zero_grad()
+                label = label.type(torch.FloatTensor).cuda()
+                loss_BCE = loss(output,label)
+                loss_BCE.backward()
+                optimiz.step()
+                if i % 10 == 0:
+                    print("Epoch num {}\n Current loss {}\n".format(epoch, loss_BCE.data[0]))
+                    iter_num += 10
+                    count.append(iter_num)
+                    loss_log.append(loss_BCE.data[0])
+                    
+        torch.save(net.state_dict(),f='p1a_model_aug_final')
+    if args.load:
+        net.load_state_dict(torch.load(f='p1a_model_aug_final'))
 
-net.load_state_dict(torch.load(f='p1a_model_aug_100'))
+# =============================================================================
+#     '''train testing'''
+# =============================================================================
+        total = 0
+        correct = 0
+        for i,data_test1 in enumerate(data_train,0):
+            img1Test,img2Test,labelTest = data_test1
+            img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+            labelTest = labelTest.type('torch.LongTensor')
+            #labelTest = labelTest.type(torch.FloatTensor).cuda()
+            output = net.forward(img1Test,img2Test)
+            pred = (torch.round(output)).type('torch.LongTensor')
+            #print type(pred.data), 'and ', type(labelTest.data)
+            total += labelTest.size(0)
+            correct += (pred == labelTest).sum().type('torch.LongTensor')
+        correct = correct.data.numpy().astype(np.float)
+        accuracy = (100*correct/total)
+        print('Accuracy of the network on trained images: %d %%' % accuracy)
+    
+# =============================================================================
+#     '''test testing'''
+# =============================================================================
+        total = 0
+        correct = 0
+        for i,data_test2 in enumerate(data_test,0):
+            img1Test,img2Test,labelTest = data_test2
+            img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+            labelTest = labelTest.type('torch.LongTensor')
+            #labelTest = labelTest.type(torch.FloatTensor).cuda()
+            output = net.forward(img1Test,img2Test)
+            pred = (torch.round(output)).type('torch.LongTensor')
+            #print type(pred.data), 'and ', type(labelTest.data)
+            total += labelTest.size(0)
+            correct += (pred == labelTest).sum().type('torch.LongTensor')
+        correct = correct.data.numpy().astype(np.float)
+        accuracy = (100*correct/total)
+        print('Accuracy of the network on tested images: %d %%' % accuracy)
 
-'''train testing'''
-total = 0
-correct = 0
-for i,data_test1 in enumerate(data_train,0):
-    img1Test,img2Test,labelTest = data_test1
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor')
-    #labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.forward(img1Test,img2Test)
-    pred = (torch.round(output)).type('torch.LongTensor')
-    #print type(pred.data), 'and ', type(labelTest.data)
-    total += labelTest.size(0)
-    correct += (pred == labelTest).sum().type('torch.LongTensor')
-correct = correct.data.numpy().astype(np.float)
-accuracy = (100*correct/total)
-print('Accuracy of the network on trained images: %d %%' % accuracy)
-
-'''test testing'''
-total = 0
-correct = 0
-for i,data_test2 in enumerate(data_test,0):
-    img1Test,img2Test,labelTest = data_test2
-    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor')
-    #labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.forward(img1Test,img2Test)
-    pred = (torch.round(output)).type('torch.LongTensor')
-    #print type(pred.data), 'and ', type(labelTest.data)
-    total += labelTest.size(0)
-    correct += (pred == labelTest).sum().type('torch.LongTensor')
-correct = correct.data.numpy().astype(np.float)
-accuracy = (100*correct/total)
-print('Accuracy of the network on tested images: %d %%' % accuracy)
-
+if __name__ == "__main__":
+    main()
