@@ -186,34 +186,37 @@ net.load_state_dict(torch.load(f='p1b_model'))
 '''train testing'''
 total = 0
 correct = 0
+threshold = 1
 for i,data_test1 in enumerate(data_train,0):
     img1Test,img2Test,labelTest = data_test1
+    labelTest = labelTest.type(torch.ByteTensor)
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor')
-    #labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.forward(img1Test,img2Test)
-    pred = (torch.round(output)).type('torch.LongTensor')
-    #print type(pred.data), 'and ', type(labelTest.data)
+    output1,output2 = net.forward(img1Test,img2Test)
+    dist = F.pairwise_distance(output1,output2)
     total += labelTest.size(0)
+    pred = (dist < threshold)
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
 print('Accuracy of the network on trained images: %d %%' % accuracy)
 
 '''test testing'''
+'''train testing'''
 total = 0
 correct = 0
+threshold = 1
 for i,data_test2 in enumerate(data_test,0):
     img1Test,img2Test,labelTest = data_test2
+    labelTest = labelTest.type(torch.ByteTensor)
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
     labelTest = labelTest.type('torch.LongTensor')
-    #labelTest = labelTest.type(torch.FloatTensor).cuda()
-    output = net.forward(img1Test,img2Test)
-    pred = (torch.round(output)).type('torch.LongTensor')
-    #print type(pred.data), 'and ', type(labelTest.data)
+    output1,output2 = net.forward(img1Test,img2Test)
+    dist = F.pairwise_distance(output1,output2)
     total += labelTest.size(0)
+    pred = (dist < threshold)
     correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
-print('Accuracy of the network on tested images: %d %%' % accuracy)
+print('Accuracy of the network on test images: %d %%' % accuracy)
 
