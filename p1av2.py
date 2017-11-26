@@ -27,7 +27,7 @@ def reader(r,mode):
     for line in data:
         objects = line.split()
         result.append(objects)
-        print objects
+        #print objects
     return result
 
 
@@ -53,7 +53,8 @@ class lfwDataset(Dataset):
                 img2 = self.augmentation(img2)
             img1 = self.transform(img1)
             img2 = self.transform(img2)
-            
+            label = torch.from_numpy(np.array([label], dtype=float))
+        
         return img1, img2, label
     
     def augmentation(self, img0):
@@ -174,38 +175,36 @@ for epoch in range(Config.train_epochs):
 torch.save(net.state_dict(),f='p1a_model')
 
 net.load_state_dict(torch.load(f='p1a_model'))
-# =============================================================================
-# 
-# '''train testing'''
-# total = 0
-# correct = 0
-# for i,data_test in enumerate(data_train,0):
-#     img1Test,img2Test,labelTest = data_test
-#     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-#     labelTest = labelTest.type('torch.LongTensor')
-#     labelTest = labelTest.type(torch.FloatTensor).cuda()
-#     output = net.foward(img1Test,img2Test)
-#     output = (torch.round(output)).type('torch.LongTensor')
-#     total += labelTest.size(0)
-#     correct += (output == labelTest).sum().type('torch.LongTensor')
-# correct = correct.data.numpy().astype(np.float)
-# accuracy = (100*correct/total)
-# print('Accuracy of the network on trained images: %d %%' % accuracy)
-# 
-# '''test testing'''
-# total = 0
-# correct = 0
-# for i,data_test in enumerate(data_test,0):
-#     img1Test,img2Test,labelTest = data_test
-#     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-#     labelTest = labelTest.type('torch.LongTensor').cuda()
-#     labelTest = labelTest.type(torch.FloatTensor).cuda()
-#     output = net.foward(img1Test,img2Test)
-#     output = (torch.round(output)).type('torch.LongTensor')
-#     total += labelTest.size(0)
-#     correct += (output == labelTest).sum().type('torch.LongTensor')
-# correct = correct.data.numpy().astype(np.float)
-# accuracy = (100*correct/total)
-# print('Accuracy of the network on trained images: %d %%' % accuracy)
-# =============================================================================
+
+'''train testing'''
+total = 0
+correct = 0
+for i,data_test in enumerate(data_train,0):
+    img1Test,img2Test,labelTest = data_test
+    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+    labelTest = labelTest.type('torch.LongTensor')
+    labelTest = labelTest.type(torch.FloatTensor).cuda()
+    output = net.foward(img1Test,img2Test)
+    output = (torch.round(output)).type('torch.LongTensor')
+    total += labelTest.size(0)
+    correct += (output == labelTest).sum().type('torch.LongTensor')
+correct = correct.data.numpy().astype(np.float)
+accuracy = (100*correct/total)
+print('Accuracy of the network on trained images: %d %%' % accuracy)
+
+'''test testing'''
+total = 0
+correct = 0
+for i,data_test in enumerate(data_test,0):
+    img1Test,img2Test,labelTest = data_test
+    img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
+    labelTest = labelTest.type('torch.LongTensor').cuda()
+    labelTest = labelTest.type(torch.FloatTensor).cuda()
+    output = net.foward(img1Test,img2Test)
+    output = (torch.round(output)).type('torch.LongTensor')
+    total += labelTest.size(0)
+    correct += (output == labelTest).sum().type('torch.LongTensor')
+correct = correct.data.numpy().astype(np.float)
+accuracy = (100*correct/total)
+print('Accuracy of the network on trained images: %d %%' % accuracy)
 
