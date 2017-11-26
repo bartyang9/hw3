@@ -178,8 +178,8 @@ correct = 0
 for i,data_test in enumerate(data_train,0):
     img1Test,img2Test,labelTest = data_test
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cude(), Variable(labelTest).cuda()
-    labelTest = labelTest.type(torch.FloatTensor).cuda()
     labelTest = labelTest.type('torch.LongTensor')
+    labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.foward(img1Test,img2Test)
     output = (torch.round(output)).type('torch.LongTensor')
     total += labelTest.size(0)
@@ -194,8 +194,8 @@ correct = 0
 for i,data_test in enumerate(data_test,0):
     img1Test,img2Test,labelTest = data_test
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cude(), Variable(labelTest).cuda()
-    labelTest = labelTest.type(torch.FloatTensor).cuda()
     labelTest = labelTest.type('torch.LongTensor')
+    labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.foward(img1Test,img2Test)
     output = (torch.round(output)).type('torch.LongTensor')
     total += labelTest.size(0)
