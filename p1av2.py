@@ -138,7 +138,7 @@ def imshow(img):
 readersTrain = reader(Config.split_dir, 'train.txt')
 lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
                        transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
-readerTest = reader(Config.split_dir,'test,txt')
+readerTest = reader(Config.split_dir,'test.txt')
 lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
                       transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
 data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num_workers=8)
