@@ -125,7 +125,7 @@ class SiameseNetWork(nn.Module):
 class Config():
     training_dir =  '/home/yikuangy/hw3/lfw/' 
     batch_size = 64
-    train_epochs = 2
+    train_epochs = 1
     split_dir = '/home/yikuangy/hw3/'
     
 '''define loss function'''
@@ -140,13 +140,13 @@ class ContrastiveLoss(nn.Module):
                                       (1-label)* torch.pow(torch.clamp(self.margin - euclidean_distance, min=0.0),2))
         return loss_contrastive
     
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--load', action = 'store_true')
     parser.add_argument('--save', action = 'store_true')
     parser.add_argument("file")
     args = parser.parse_args()
-    file = args.file    
+    filename = args.file    
 # =============================================================================
 #     '''create traning and testing reader&dataset'''
 # =============================================================================
@@ -165,7 +165,6 @@ def main():
 # =============================================================================
     if args.save:
         loss = ContrastiveLoss()
-        #loss = nn.BCELoss()
         optimiz = optim.Adam(params=net.parameters(),lr = 0.001)
         count = []
         loss_log = []
@@ -173,7 +172,6 @@ def main():
         for epoch in range(Config.train_epochs):
             for i,data in enumerate(data_train,0):
                 img1,img2,label = data
-                #print type(img1), type(label)
                 img1,img2,label = Variable(img1).cuda(), Variable(img2).cuda(), Variable(label).cuda()
                 output1,output2 = net.forward(img1,img2)
                 optimiz.zero_grad()
@@ -186,12 +184,11 @@ def main():
                     iter_num += 10
                     count.append(iter_num)
                     loss_log.append(loss_contras.data[0])
-                    
-        torch.save(net.state_dict(),f=file)
+        torch.save(net.state_dict(),f=args.file)
         
         
     if args.load:
-        net.load_state_dict(torch.load(f=file))
+        net.load_state_dict(torch.load(f=args.file))
 # =============================================================================
 #     '''train testing'''
 # =============================================================================
