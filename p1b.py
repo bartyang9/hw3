@@ -143,7 +143,7 @@ class ContrastiveLoss(nn.Module):
     
 '''create traning and testing reader&dataset'''
 readersTrain = reader(Config.split_dir, 'train.txt')
-lfw_train = lfwDataset(root=Config.training_dir,augment=False,reader=readersTrain,
+lfw_train = lfwDataset(root=Config.training_dir,augment=True,reader=readersTrain,
                        transform=transforms.Compose([transforms.Scale((128,128)),transforms.ToTensor()]))
 readerTest = reader(Config.split_dir,'test.txt')
 lfw_test = lfwDataset(root=Config.training_dir,augment=False,reader=readerTest,
