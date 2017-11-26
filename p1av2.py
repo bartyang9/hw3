@@ -94,7 +94,7 @@ class SiameseNetWork(nn.Module):
                 nn.MaxPool2d(2,stride = 2),                             
                 
                 nn.Conv2d(128, 256, kernel_size=3, padding=1),      
-                nn.ReLU(Git works best if you give it some basic information: your name and your email address. You can set these options in Git with the following commands:inplace=True),
+                nn.ReLU(inplace=True),
                 nn.BatchNorm2d(256),                              
                 nn.MaxPool2d(2, stride=2),                             
                 
@@ -180,11 +180,11 @@ net.load_state_dict(torch.load(f='p1a_model'))
 '''train testing'''
 total = 0
 correct = 0
-for i,data_test in enumerate(data_train,0):
-    img1Test,img2Test,labelTest = data_test
+for i,data_test1 in enumerate(data_train,0):
+    img1Test,img2Test,labelTest = data_test1
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type(torch.FloatTensor).cuda()
     labelTest = labelTest.type('torch.LongTensor')
+    labelTest = labelTest.type(torch.FloatTensor).cuda()
     output = net.forward(img1Test,img2Test)
     pred = (torch.round(output)).type('torch.LongTensor')
     print type(pred), 'and ', type(labelTest)
@@ -197,15 +197,15 @@ print('Accuracy of the network on trained images: %d %%' % accuracy)
 '''test testing'''
 total = 0
 correct = 0
-for i,data_test in enumerate(data_test,0):
-    img1Test,img2Test,labelTest = data_test
+for i,data_test2 in enumerate(data_test,0):
+    img1Test,img2Test,labelTest = data_test2
     img1Test,img2Test,labelTest = Variable(img1Test,volatile=True).cuda(), Variable(img2Test,volatile=True).cuda(), Variable(labelTest).cuda()
-    labelTest = labelTest.type('torch.LongTensor').cuda()
     labelTest = labelTest.type(torch.FloatTensor).cuda()
+    labelTest = labelTest.type('torch.LongTensor').cuda()
     output = net.forward(img1Test,img2Test)
-    output = (torch.round(output)).type('torch.LongTensor')
+    pred = (torch.round(output)).type('torch.LongTensor')
     total += labelTest.size(0)
-    correct += (output == labelTest).sum().type('torch.LongTensor')
+    correct += (pred == labelTest).sum().type('torch.LongTensor')
 correct = correct.data.numpy().astype(np.float)
 accuracy = (100*correct/total)
 print('Accuracy of the network on trained images: %d %%' % accuracy)
