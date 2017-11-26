@@ -1,36 +1,22 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# =============================================================================
-# import torch #
-# import torchvision
-# import torchvision.datasets as dset #
-# import torchvision.transforms as transforms #
-# from torch.utils.data import DataLoader, Dataset #
-# import matplotlib.pyplot as plt
-# import torchvision.utils #
-# import numpy as np
-# import random
-# from PIL import Image
-# from torch.autograd import Variable #
-# import PIL.ImageOps
-# import torch.nn as nn #
-# from torch import optim
-# import torch.nn.functional as F
-# 
-# =============================================================================
-import torch.nn as nn
-import numpy as np
-from PIL import Image
-from matplotlib import pyplot as plt
-import torch
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-import random
-from torchvision import datasets as dset
-from torchvision import transforms
-from torch import optim
-from torch.autograd import Variable
+import torch #
 import torchvision
+import torchvision.datasets as dset #
+import torchvision.transforms as transforms #
+from torch.utils.data import DataLoader, Dataset #
+import matplotlib.pyplot as plt
+import torchvision.utils #
+import numpy as np
+import random
+from PIL import Image
+from torch.autograd import Variable #
+import PIL.ImageOps
+import torch.nn as nn #
+from torch import optim
+import torch.nn.functional as F
+
+
 
 '''create the image folder list'''
 def reader(r,mode):
@@ -160,7 +146,7 @@ data_train = DataLoader(lfw_train, batch_size=Config.batch_size,shuffle=True,num
 data_test = DataLoader(lfw_test, batch_size=Config.batch_size,shuffle=False,num_workers=8)
 
 '''train'''
-net = SiameseNetWork().cuda
+net = SiameseNetWork().cuda()
 loss = nn.BCELoss()
 optimiz = optim.Adam(params=net.parameters(),lr = 0.00001)
 count = []
